@@ -1,0 +1,12 @@
+version: '3.5'
+
+services: 
+  kestrel-whoami:
+    image: ${REPO:-christianacca/kestrel-whoami}:${TAG:-latest}
+    build:
+      context: ./src/kestrel-whoami
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    environment: 
+      - Kestrel__Limits__KeepAliveTimeout=00:00:20
