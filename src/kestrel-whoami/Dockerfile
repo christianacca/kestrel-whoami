@@ -14,5 +14,6 @@ RUN dotnet publish -c Release -o /app --no-build
 
 FROM base AS final
 WORKDIR /app
+HEALTHCHECK CMD curl --fail http://localhost/api/health || exit
 ENTRYPOINT ["dotnet", "kestrel-whoami.dll"]
 COPY --from=publish /app .
