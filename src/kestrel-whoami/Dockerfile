@@ -23,6 +23,8 @@ WORKDIR /app
 HEALTHCHECK CMD curl --fail http://localhost/api/health || exit
 ENTRYPOINT ["dotnet", "kestrel-whoami.dll"]
 
+COPY --from=publish /app .
+
 LABEL org.opencontainers.image.created=$DATE \
     org.opencontainers.image.vendor="christianacca" \
     org.opencontainers.image.title="christianacca/kestrel-whoami" \
@@ -32,5 +34,3 @@ LABEL org.opencontainers.image.created=$DATE \
     org.opencontainers.image.version="$VERSION" \
     org.opencontainers.image.source=$URL \
     org.opencontainers.image.revision=$COMMIT
-
-COPY --from=publish /app .
