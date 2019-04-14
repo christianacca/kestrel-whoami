@@ -20,7 +20,8 @@ ARG URL="https://github.com/jnovack/dockerhub-hooks"
 ARG VERSION="dirty"
 
 WORKDIR /app
-HEALTHCHECK CMD curl --fail http://localhost/api/health || exit
+HEALTHCHECK --interval=5s --timeout=5s \
+    CMD curl --fail http://localhost/api/health || exit 1
 ENTRYPOINT ["dotnet", "kestrel-whoami.dll"]
 
 COPY --from=publish /app .
