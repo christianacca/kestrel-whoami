@@ -16,7 +16,7 @@ FROM base AS final
 
 ARG COMMIT="local-build"
 ARG DATE="1970-01-01T00:00:00Z"
-ARG URL="https://github.com/jnovack/dockerhub-hooks"
+ARG URL="https://github.com/christianacca/kestrel-whoami"
 ARG VERSION="dirty"
 
 WORKDIR /app
