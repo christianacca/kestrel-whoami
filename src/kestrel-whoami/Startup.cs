@@ -1,12 +1,10 @@
 ﻿using App.Health;
 using App.Swagger;
 using Hellang.Middleware.ProblemDetails;
+using Hellang.Middleware.ProblemDetails.Mvc;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 
 namespace App
 {
@@ -27,11 +25,11 @@ namespace App
         /// </remarks>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.Configure<MvcJsonOptions>(options =>
-                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore);
-
-            services.AddProblemDetails();
+            services
+                .AddProblemDetails()
+                .AddControllersWithViews()
+                .AddJsonOptions(o => o.JsonSerializerOptions.IgnoreNullValues = true)
+                .AddProblemDetailsConventions();
 
             services.AddSingleton<HealthCheckToggle>();
             services.ConfigureOptions<HealthCheckOptionsSetup>();
@@ -50,16 +48,26 @@ namespace App
         /// <remarks>
         ///     This method gets called by the runtime
         /// </remarks>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseProblemDetails();
-
-            app.UseHealthChecks("/api/health");
 
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseMvc();
+            app.UseRouting();
+
+            app.UseCors(builder =>
+                builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod());
+
+            app.UseEndpoints(endpoints => {
+                endpoints.MapHealthChecks("/api/health");
+                endpoints.MapControllerRoute(
+                    "default",
+                    "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }

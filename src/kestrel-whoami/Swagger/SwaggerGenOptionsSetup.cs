@@ -16,7 +16,7 @@ namespace App.Swagger
                 "LibraryOpenAPISpecification",
                 new OpenApiInfo
                 {
-                    Title = "ASP.Net Core WhoAmI service",
+                    Title = "ASP.Net 5 WhoAmI service",
                     Version = "1"
                 }
             );

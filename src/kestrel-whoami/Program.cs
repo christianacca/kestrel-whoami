@@ -1,6 +1,6 @@
 ﻿using App.KestrelSettings;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace App
 {
@@ -8,14 +8,13 @@ namespace App
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
-        {
-            return WebHost.CreateDefaultBuilder(args)
-                .ConfigureKestrel(KestrelSettingsSetup.Configure)
-                .UseStartup<Startup>();
-        }
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder => webBuilder
+                    .ConfigureKestrel(KestrelSettingsSetup.Configure)
+                    .UseStartup<Startup>());
     }
 }
