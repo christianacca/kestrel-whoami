@@ -1,0 +1,70 @@
+# For the list of variables that can be modified see: https://github.com/bitnami/charts/tree/master/bitnami/aspnet-core
+
+kestrel-whoami:
+  image:
+    repository: christianacca/kestrel-whoami
+    tag: 2
+  command: ["dotnet", "kestrel-whoami.dll"]
+  extraEnvVars:
+    ASPNETCORE_FORWARDEDHEADERS_ENABLED: true
+  bindURLs: http://+:80
+  containerPorts:
+    http: 80
+  nodeSelector:
+    'beta.kubernetes.io/os': linux
+  appFromExternalRepo:
+    enabled: false
+  serviceAccount:
+    create: false
+    automountServiceAccountToken: false
+  resources:
+    # IMPORTANT: How to set limits and requests...
+    # Set resource requests to the amount utilized by a "normal" workload with 2 pods running
+    # Set resource limits to be 2.5 X requested value. This will allow for spikes in traffic.
+    limits:
+      cpu: 190m
+      memory: 375Mi
+    requests:
+      cpu: 75m
+      memory: 150Mi
+  customStartupProbe:
+    httpGet:
+      path: /api/health
+      port: 80
+    initialDelaySeconds: 10
+  readinessProbe:
+    enabled: false # we're using startupProbe instead as don't want/need readinessProbe semantics
+  livenessProbe:
+    enabled: false
+  customLivenessProbe:
+    httpGet:
+      path: /api/health
+      port: 80
+    initialDelaySeconds: 3
+  autoscaling:
+    enabled: true
+    # the targets below are a % of resource REQUESTS (not limits). The values here is based on the following thoughts:
+    # Say you set request to 100m and limit to 250m. Set HPA to 200% cpu utilisation - this way the pods will scale when CPU usage hits 200m. 
+    # This resulted in more efficient use of the nodes across the cluster as opposed to setting both request and limit to 250m and scaling at 75% CPU utilisation.
+    # With requests at 100m, I can spin up more pods faster when HPA kicks in (because with the same infrastructure I have more free capacity) 
+    # and at the same time it allows some time for a new VM to come up and join the cluster for more capacity.
+    targetCPU: 200 # k8 will throttle cpu a pod receives so don't need to scale as quickly as memory
+    targetMemory: 180 # scale up sooner for memory as k8 will kill a pod that exceeds it's memory limit
+    minReplicas: 1
+    maxReplicas: 2
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostname: whoami.codingdemo.co.uk
+    extraTls:
+      - hosts:
+          - whoami.codingdemo.co.uk
+        secretName: codingdemo.co.uk-wildcard-tls
+  healthIngress:
+    enabled: true
+    ingressClassName: nginx
+    hostname: prod-aks-eastus.whoami.codingdemo.co.uk
+    path: /trafficmanager-health-app-whoami
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /api/health
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
