@@ -24,8 +24,20 @@ Settings can be supplied by:
 * docker volume to supply an appsettings.json file
 * docker environment variable. See [docker-compose.yml](docker-compose.yml) for an example
 
-## Build / Publish
+## Build / Publish Docker image
 
 * Build only: `./build.ps1`
 * Build + publish: `./build.ps1 -Tag n.n.n -Publish -Credential christianacca`
-    * replace 'n.n.n' with the sematic version that describes the change EG: 1.0.0
+    * replace 'n.n.n' with the semantic version that describes the change EG: 1.0.0
+
+## Deploy
+
+1. Update the ingress settings in [values.yaml](tools/helm/values.yaml) to fit your requirement 
+   * this sample uses [AKS HTTP application routing](https://docs.microsoft.com/en-gb/azure/aks/http-application-routing)
+2. Deploy helm chart:
+
+   ```bash
+   cd ./tools/helm
+   helm dependency build .
+   helm upgrade --install --atomic --cleanup-on-fail kestrel-whoami .
+   ```

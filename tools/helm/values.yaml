@@ -1,6 +1,7 @@
 # For the list of variables that can be modified see: https://github.com/bitnami/charts/tree/master/bitnami/aspnet-core
+# For details about ingress see AKS docs: https://docs.microsoft.com/en-gb/azure/aks/http-application-routing
 
-kestrel-whoami:
+web:
   image:
     repository: christianacca/kestrel-whoami
     tag: 2
@@ -54,17 +55,6 @@ kestrel-whoami:
     maxReplicas: 2
   ingress:
     enabled: true
-    ingressClassName: nginx
-    hostname: whoami.codingdemo.co.uk
-    extraTls:
-      - hosts:
-          - whoami.codingdemo.co.uk
-        secretName: codingdemo.co.uk-wildcard-tls
-  healthIngress:
-    enabled: true
-    ingressClassName: nginx
-    hostname: prod-aks-eastus.whoami.codingdemo.co.uk
-    path: /trafficmanager-health-app-whoami
+    hostname: kestrel-whoami-web.11c06eea433a4a4581ca.eastus.aksapp.io
     annotations:
-      nginx.ingress.kubernetes.io/rewrite-target: /api/health
-      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      kubernetes.io/ingress.class: addon-http-application-routing
