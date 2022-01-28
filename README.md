@@ -38,6 +38,7 @@ Settings can be supplied by:
 
    ```bash
    cd ./tools/helm
+   helm repo add bitnami https://charts.bitnami.com/bitnami
    helm dependency build .
    helm upgrade --install --atomic --cleanup-on-fail kestrel-whoami .
    ```
